@@ -12,7 +12,7 @@ to execute basic events:
 
 ## Installation ##
 
-1. For *Shopware plugin* you should put plugin sources to Shopware `src/custom/plugins/` folder cleaning `shopware-plugin` names/folders first, 
+1. For *Shopware plugin* you should put this repo plugin sources to Shopware `src/custom/plugins/` folder cleaning `shopware-plugin` names/folders first, 
 app will automatically detect all plugins that residue within this folder,
 
 2. If upgrading from previous version please remember to update database
