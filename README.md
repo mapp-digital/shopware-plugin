@@ -1,4 +1,4 @@
-# shopware-plugin extension for Shopware #
+# Mapp shopware-plugin events extension for Shopware #
 
 ## Overall information ##
 
