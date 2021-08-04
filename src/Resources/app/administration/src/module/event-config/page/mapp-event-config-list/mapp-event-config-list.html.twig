@@ -1,0 +1,69 @@
+<sw-page>
+    <template #search-bar>
+        <sw-search-bar
+            initialSearchType="event_action"
+            placeholder="Search"
+            :initialSearch="term"
+            @search="onSearch">
+        </sw-search-bar>
+    </template>
+
+    <template #smart-bar-header>
+        <h2>
+            MappConnect Business Events
+            <span v-if="total > 0"> ({{ total }})</span>
+        </h2>
+    </template>
+
+    <template slot="smart-bar-actions">
+        <sw-button
+            :routerLink="{ name: 'mapp.event.config.create' }"
+            variant="primary">
+            Add Event
+        </sw-button>
+    </template>
+
+    <template #content>
+        <sw-entity-listing
+            :repository="mappEventRepository"
+            :columns="mappEventColumns"
+            :items="items"
+            :sortBy="sortBy"
+            :sortDirection="sortDirection"
+            :isLoading="isLoading"
+            :allowInlineEdit="false"
+            detailRoute="mapp.event.config.detail"
+            >
+
+            <template #column-eventName="{ item, column }">
+                <strong>
+                    <router-link :to="{ name: column.routerLink, params: { id: item.id } }">
+                        {{ $tc('global.businessEvents.' + snakeCaseEventName(item.eventName)) }}
+                    </router-link>
+                </strong><br>
+                {{ item.eventName }}
+            </template>
+
+            <template #column-salesChannels="{ item, isInlineEdit }">
+                <sw-event-action-list-expand-labels
+                    :items="item.salesChannels"
+                    :disabled="isInlineEdit">
+                </sw-event-action-list-expand-labels>
+            </template>
+
+            <template #column-rules="{ item, isInlineEdit }">
+                <sw-event-action-list-expand-labels
+                    :items="item.rules"
+                    :disabled="isInlineEdit">
+                </sw-event-action-list-expand-labels>
+            </template>
+
+            <template #column-active="{ item, isInlineEdit }">
+                <sw-data-grid-column-boolean
+                    v-model="item.active"
+                    :isInlineEdit="isInlineEdit">
+                </sw-data-grid-column-boolean>
+            </template>
+        </sw-entity-listing>
+    </template>
+</sw-page>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/platform/master/src/Core/System/SystemConfig/Schema/config.xsd">
+
+    <card>
+        <title>General Configuration</title>
+        <input-field type="bool">
+            <name>integrationEnable</name>
+            <label>Module Enable</label>
+        </input-field>
+        <input-field type="url">
+            <name>baseUrl</name>
+            <label>Mapp Connect API URL</label>
+            <helpText>URL to Mapp Connect API</helpText>
+        </input-field>
+        <component name="mapp-connection-status">
+          <name>connectionStatus</name>
+          <label>Connection Status</label>
+        </component>
+    </card>
+
+    <card>
+        <title>Integration Configuration</title>
+        <input-field type="text">
+            <name>integrationID</name>
+            <label>Integration ID</label>
+            <helpText>Copy Integration ID from created Shopware integration.</helpText>
+        </input-field>
+        <input-field type="password">
+            <name>integrationSecret</name>
+            <label>Integration Secret</label>
+            <comment>Copy generated secret key from created Shopware integration.</comment>
+        </input-field>
+    </card>
+
+    <card>
+        <title>Data synchronisation</title>
+        <input-field type="bool">
+            <name>dataCustomers</name>
+            <label>Customers data</label>
+            <helpText>Adds contacts to Mapp Engage Customers group with atrribbutes</helpText>
+        </input-field>
+        <input-field type="bool">
+            <name>dataGuests</name>
+            <label>Guests data</label>
+            <helpText>Adds contacts to Mapp Engage Guest group with atrribbutes</helpText>
+        </input-field>
+        <input-field type="bool">
+            <name>dataOrderCustomers</name>
+            <label>Orders data - customers</label>
+            <helpText>Adds customers orders data to Mapp Engage Transactional Related Data</helpText>
+        </input-field>
+        <input-field type="bool">
+            <name>dataOrderGuests</name>
+            <label>Orders data - guests</label>
+            <helpText>Adds guest orders data to Mapp Engage Transactional Related Data</helpText>
+        </input-field>
+        <input-field type="bool">
+            <name>dataNewsletter</name>
+            <label>Newsletter</label>
+            <helpText>Adds users to Newsletter group. Sendout and optin is setup wihin Newsletter group</helpText>
+        </input-field>
+    </card>
+    <card>
+        <title>Group Setup</title>
+        <component name="mapp-select">
+            <name>groupCustomers</name>
+            <entity>group</entity>
+            <label>Customers</label>
+        </component>
+        <component name="mapp-select">
+            <name>groupGuests</name>
+            <entity>group</entity>
+            <label>Guests</label>
+        </component>
+        <component name="mapp-select">
+            <name>groupNewsletter</name>
+            <entity>group</entity>
+            <label>Newsletter</label>
+        </component>
+    </card>
+</config>

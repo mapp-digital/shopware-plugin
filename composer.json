@@ -1,0 +1,33 @@
+{
+    "name": "mappconnect/shopware-plugin",
+    "description": "Mapp Connect integration for Shopware 6",
+    "version": "0.0.1",
+    "type": "shopware-platform-plugin",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mapp"
+        }
+    ],
+    "require": {
+        "shopware/core": "6.3.*",
+        "firebase/php-jwt": "^5.0",
+        "mappconnect/client": "^0.1.2"
+    },
+    "extra": {
+        "shopware-plugin-class": "Mapp\\Connect\\Shopware\\MappConnect",
+        "label": {
+            "de-DE": "Mapp Connect",
+            "en-GB": "Mapp Connect"
+        },
+        "description": {
+            "de-DE": "Mapp Connect Integration",
+            "en-GB": "Mapp Connect Integration"
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Mapp\\Connect\\Shopware\\": "src/"
+        }
+    }
+}

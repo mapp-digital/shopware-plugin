@@ -1,0 +1,84 @@
+<sw-page class="sw-event-action-detail">
+    <template #smart-bar-header>
+          <h2>{{ identifier }}</h2>
+    </template>
+
+    <template #smart-bar-actions>
+        <sw-button :routerLink="{ name: 'mapp.event.config.index' }">
+              {{ $tc('global.default.cancel') }}
+        </sw-button>
+
+        <sw-button-process
+              :isLoading="isLoading"
+              :processSuccess="isSaveSuccessful"
+              variant="primary"
+              @process-finish="saveFinish"
+              :disabled="isLoading"
+              @click.prevent="onSave">
+              {{ $tc('sw-product.detail.buttonSave') }}
+        </sw-button-process>
+    </template>
+
+    <template #content>
+        <sw-card-view>
+            <sw-card :isLoading="isLoading">
+                <sw-container columns="75% 1fr" gap="30px">
+                    <sw-field
+                        v-if="mappEvent"
+                        type="text"
+                        label="Title"
+                        placeholder=""
+                        v-model="mappEvent.title">
+                    </sw-field>
+                    <sw-switch-field
+                        v-if="mappEvent"
+                        label="Active"
+                        v-model="mappEvent.active"
+                        bordered>
+                    </sw-switch-field>
+                </sw-container>
+
+
+                <sw-single-select
+                      v-if="mappEvent && businessEvents"
+                      label="Business Event"
+                      :options="businessEvents"
+                      v-model="mappEvent.eventName"
+                      required
+                      labelProperty="label"
+                      valueProperty="name">
+
+                      <template #selection-label-property="{ item }">
+                          <strong>{{ item.label }}</strong> - {{ item.name }}
+                      </template>
+
+                      <template #result-label-property="{ item, highlightSearchTerm, labelProperty, searchTerm }">
+                          <strong>
+                              <sw-highlight-text
+                                  :text="item.label"
+                                  :searchTerm="searchTerm">
+                              </sw-highlight-text>
+                          </strong>
+                          {{ item.name }}
+                      </template>
+                </sw-single-select>
+
+                <sw-entity-multi-select
+                    v-if="mappEvent"
+                    label="Sales Channel"
+                    v-model="mappEvent.salesChannels">
+                </sw-entity-multi-select>
+
+                <mapp-select
+                    v-if="mappEvent"
+                    label="Message"
+                    entity="message"
+                    v-bind:value="mappEvent.messageId"
+                    v-on:change="mappEvent.messageId = $event"
+                    >
+                </mapp-select>
+
+            </sw-card>
+        </sw-card-view>
+    </template>
+</sw-page>
