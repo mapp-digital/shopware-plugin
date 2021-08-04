@@ -1,4 +1,4 @@
-# Mapp Connect APIs Client Library for PHP #
+# shopware-plugin extension for Shopware #
 
 ## Overall information ##
 
