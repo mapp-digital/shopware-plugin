@@ -1,4 +1,4 @@
-# Mapp shopware-plugin events extension for Shopware #
+# Mapp Connect Shopware 6 plugin - events extension for Shopware #
 
 ## Overall information ##
 
@@ -38,4 +38,4 @@ And deploy new UI assets
 * `php bin/console plugin:refresh`
 * `php bin/console plugin:install --activate MappConnect`
 
-And you can now use Plugin along with all events support in relation to Mapp Connect.
+Now you use Plugin along with Buissnes Events triggering message sendout or sending event to Whiteboard (automation).
