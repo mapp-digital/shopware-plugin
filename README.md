@@ -33,7 +33,7 @@ And deploy new UI assets
 
 5a. [Shopware 6.3.x] Going to *Administration* section in Shopware, and next go to *Settings->System->Plugins* and from the list **Install** ( you can also **Configure** it from context menu), and next **Activate** this within toggle button,
 
-5a. [Shopware 6.4.x] Going to *Extensions* section in Shopware, and next go to *My extensions->Apps* and from the list **Install** ( you can also **Configure** it from context menu), and next **Activate** this within toggle button,
+5b. [Shopware 6.4.x] Going to *Extensions* section in Shopware, and next go to *My extensions->Apps* and from the list **Install** ( you can also **Configure** it from context menu), and next **Activate** this within toggle button,
 
 5c. You can also activate this from the Shopware console by:
 
