@@ -10,9 +10,10 @@
         }
     ],
     "require": {
-        "shopware/core": "6.4.2.1",
+        "shopware/core": ">=6.4.2.1",
         "firebase/php-jwt": "^5.0",
-        "mappconnect/client": "0.1.2.1"
+        "guzzlehttp/guzzle": "~7.2",
+        "guzzlehttp/psr7": "^1.2"
     },
     "extra": {
         "shopware-plugin-class": "Mapp\\Connect\\Shopware\\MappConnect",

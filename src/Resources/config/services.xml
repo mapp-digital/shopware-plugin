@@ -8,6 +8,10 @@
           <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
       </service>
       <service id="Mapp\Connect\Shopware\Administration\MappConnectController" public="true">
+          <call method="setContainer">
+              <argument type="service" id="Psr\Container\ContainerInterface"/>
+          </call>
+          <tag name="container.service_subscriber"/>
           <argument type="service" id="Mapp\Connect\Shopware\Service\MappConnectService"/>
       </service>
       <service id="Mapp\Connect\Shopware\Subscriber\MappConnectSubscriber">

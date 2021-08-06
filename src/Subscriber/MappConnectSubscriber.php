@@ -72,8 +72,7 @@ class MappConnectSubscriber implements EventSubscriberInterface
             'customer.lastName', 'customer.title', 'customer.languageId', 'customer.birthday'],
         OrderStateMachineStateChangeEvent::class => ['order.orderNumber', 'order.orderCustomer.firstName',
             'order.orderCustomer.lastName', 'order.orderCustomer.title', 'order.orderCustomer.salutation.displayName', 'order.orderNumber',
-            'order.stateMachineState.name'],
-        CheckoutOrderPlacedEvent::class => []
+            'order.stateMachineState.name']
     );
 
     public function onNewsletterChange(EntityWrittenEvent $event)
@@ -179,7 +178,9 @@ class MappConnectSubscriber implements EventSubscriberInterface
 
         $mappevents = $this->getMappEvents($event, $event->getContext());
         if (!is_null($mappevents) && $mappevents->count() > 0) {
-            $data['messageId'] = $mappevents[0]->getMessageId();
+            foreach ($mappevents as $mevent) {
+                $data['messageId'] = $mevent->getMessageId();
+            }
         }
 
         return $data;
@@ -193,7 +194,6 @@ class MappConnectSubscriber implements EventSubscriberInterface
 
             $product = $this->productRepository->search(new Criteria([$lineItem->getProductId()]), $context)->first();
 
-            $item['name'] = $lineItem->getLabel();
             $item['productId'] = $lineItem->getProductId();
             $item['quantity'] = $lineItem->getQuantity();
             $item['unitPrice'] = strval($lineItem->getUnitPrice());
@@ -274,8 +274,6 @@ class MappConnectSubscriber implements EventSubscriberInterface
             $data['group'] = $this->mappConnectService->getGroup('Guests');
         } elseif ($innerEvent instanceof OrderStateMachineStateChangeEvent) {
             $data['items'] = $this->getOrderItems($innerEvent->getOrder(), $innerEvent->getContext());
-        } elseif ($innerEvent instanceof CheckoutOrderPlacedEvent) {
-            $data = $this->getOrderData($innerEvent);
         }
 
         foreach ($mappevents as $mevent) {

@@ -28,7 +28,7 @@ class MappConnectController extends AbstractController
 
     /**
      *
-     * @Route("/api/v{version}/mappconnect/connection-status", name="api.action.mappconnect.connection-status", methods={"GET"})
+     * @Route("/api/mappconnect/connection-status", name="api.action.mappconnect.connection-status", methods={"GET"})
      * @Acl({})
      */
     public function getConnectionStatus(Request $request, Context $context): Response
@@ -39,7 +39,7 @@ class MappConnectController extends AbstractController
 
     /**
      *
-     * @Route("/api/v{version}/mappconnect/groups", name="api.action.mappconnect.groups", methods={"GET"})
+     * @Route("/api/mappconnect/groups", name="api.action.mappconnect.groups", methods={"GET"})
      * @Acl({})
      */
     public function getGroups(Request $request, Context $context): Response
@@ -50,7 +50,7 @@ class MappConnectController extends AbstractController
 
     /**
      *
-     * @Route("/api/v{version}/mappconnect/messages", name="api.action.mappconnect.messages", methods={"GET"})
+     * @Route("/api/mappconnect/messages", name="api.action.mappconnect.messages", methods={"GET"})
      * @Acl({})
      */
     public function getMessages(Request $request, Context $context): Response
