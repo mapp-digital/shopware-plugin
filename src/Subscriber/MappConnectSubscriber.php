@@ -43,13 +43,15 @@ class MappConnectSubscriber implements EventSubscriberInterface
         DefinitionInstanceRegistry $definitionRegistry,
         MappEventDefinition $mappEventDefinition,
         EntityRepositoryInterface $productRepository,
-        EntityRepositoryInterface $productManufacturerRepository)
+        EntityRepositoryInterface $productManufacturerRepository,
+        EntityRepositoryInterface $languageRepository)
     {
         $this->mappConnectService = $mappConnectService;
         $this->definitionRegistry = $definitionRegistry;
         $this->mappEventDefinition = $mappEventDefinition;
         $this->productRepository = $productRepository;
         $this->productManufacturerRepository = $productManufacturerRepository;
+        $this->languageRepository = $languageRepository;
     }
 
     public static function getSubscribedEvents(): array
@@ -67,12 +69,10 @@ class MappConnectSubscriber implements EventSubscriberInterface
         CustomerAccountRecoverRequestEvent::class => ['resetUrl', 'shopName'],
         ContactFormEvent::class => ['contactFormData.comment'],
         CustomerRegisterEvent::class => ['customer.customerNumber', 'customer.firstName',
-            'customer.lastName', 'customer.title', 'customer.languageId', 'customer.birthday'],
+            'customer.lastName', 'customer.title', 'customer.birthday'],
         GuestCustomerRegisterEvent::class => ['customer.customerNumber', 'customer.firstName',
-            'customer.lastName', 'customer.title', 'customer.languageId', 'customer.birthday'],
-        OrderStateMachineStateChangeEvent::class => ['order.orderNumber', 'order.orderCustomer.firstName',
-            'order.orderCustomer.lastName', 'order.orderCustomer.title', 'order.orderCustomer.salutation.displayName', 'order.orderNumber',
-            'order.stateMachineState.name']
+            'customer.lastName', 'customer.title', 'customer.birthday'],
+        OrderStateMachineStateChangeEvent::class => []
     );
 
     public function onNewsletterChange(EntityWrittenEvent $event)
@@ -81,6 +81,11 @@ class MappConnectSubscriber implements EventSubscriberInterface
             foreach ($event->getPayloads() as $data) {
                 $mcdata = [
                     'email' => $data['email'],
+                    'title' => $data['title'],
+                    'firstName' => $data['firstName'],
+                    'lastName' => $data['lastName'],
+                    'languageId' => $data['languageId'],
+                    'zipCode' => $data['zipCode'],
                     'group' => $this->mappConnectService->getGroup('Newsletter')
                 ];
 
@@ -104,10 +109,15 @@ class MappConnectSubscriber implements EventSubscriberInterface
                 'firstName' => $customer->getFirstName(),
                 'lastName' => $customer->getLastName(),
                 'title' => $customer->getTitle(),
-                'languageId' => $customer->getLanguageId(),
                 'birthday' => $customer->getBirthday(),
                 'group' => $this->mappConnectService->getGroup('Customers')
             ];
+
+            /*$language = $this->languageRepository->search(new Criteria([$customer->getLanguageId()]), $event->getContext())->first();
+            if (!is_null($language)) {
+                $data['languageId'] = $language->getLocaleId();
+                $data['languageName'] = $language->getName();
+            }*/
 
             if ($mc = $this->mappConnectService->getMappConnectClient()) {
                 $mc->event('user', $data);
@@ -125,7 +135,6 @@ class MappConnectSubscriber implements EventSubscriberInterface
                 'firstName' => $customer->getFirstName(),
                 'lastName' => $customer->getLastName(),
                 'title' => $customer->getTitle(),
-                'languageId' => $customer->getLanguageId(),
                 'birthday' => $customer->getBirthday(),
                 'group' => $this->mappConnectService->getGroup('Guests')
             ];
@@ -151,7 +160,7 @@ class MappConnectSubscriber implements EventSubscriberInterface
         $order = $event->getOrder();
         $data = [
             'orderNumber' => $order->getOrderNumber(),
-            'orderedAt' => $order->getOrderDateTime(),
+            'orderedAt' => $order->getOrderDateTime()->format('Y-m-d H:i:s'),
             'email' => $order->getOrderCustomer()->getEmail(),
             'campaignCode' => $order->getCampaignCode(),
             'shippingTotal' => strval($order->getShippingTotal()),
@@ -194,16 +203,18 @@ class MappConnectSubscriber implements EventSubscriberInterface
 
             $product = $this->productRepository->search(new Criteria([$lineItem->getProductId()]), $context)->first();
 
-            $item['productId'] = $lineItem->getProductId();
             $item['quantity'] = $lineItem->getQuantity();
             $item['unitPrice'] = strval($lineItem->getUnitPrice());
 
             if (!is_null($product)) {
+                $item['productId'] = $product->getProductNumber();
                 $item['name'] = $product->getName();
                 $item['description'] = $product->getDescription();
 
-                $productManufacturer = $this->productManufacturerRepository->search(new Criteria([$product->getManufacturerId()]), $context)->first();
-                $item['manufacturerName'] = $productManufacturer->getName();
+                if (!is_null($product->getManufacturerId())) {
+                    $productManufacturer = $this->productManufacturerRepository->search(new Criteria([$product->getManufacturerId()]), $context)->first();
+                    $item['manufacturerName'] = $productManufacturer->getName();
+                }
             }
 
             array_push($items, $item);
@@ -262,10 +273,13 @@ class MappConnectSubscriber implements EventSubscriberInterface
 
         $type = 'automation';
 
-        $eventData = $this->extractEventData($event);
-        $eventDataToBeSent = $this->getDataToBeSentForEvent($eventData, $event);
-        foreach ($eventDataToBeSent as $key => $value) {
-            $data[$key] = $value;
+        // data for this event can't be extracted this way
+        if (!$innerEvent instanceof OrderStateMachineStateChangeEvent) {
+            $eventData = $this->extractEventData($event);
+            $eventDataToBeSent = $this->getDataToBeSentForEvent($eventData, $event);
+            foreach ($eventDataToBeSent as $key => $value) {
+                $data[$key] = $value;
+            }
         }
 
         if ($innerEvent instanceof CustomerRegisterEvent) {
@@ -273,7 +287,21 @@ class MappConnectSubscriber implements EventSubscriberInterface
         } elseif ($innerEvent instanceof GuestCustomerRegisterEvent) {
             $data['group'] = $this->mappConnectService->getGroup('Guests');
         } elseif ($innerEvent instanceof OrderStateMachineStateChangeEvent) {
+            $data['order.orderNumber'] = $innerEvent->getOrder()->getOrderNumber();
+            try {
+                $data['order.orderCustomer.firstName'] = $innerEvent->getOrder()->getOrderCustomer()->getFirstName();
+                $data['order.orderCustomer.lastName'] = $innerEvent->getOrder()->getOrderCustomer()->getLastName();
+                $data['order.orderCustomer.title'] = $innerEvent->getOrder()->getOrderCustomer()->getTitle();
+                $data['order.orderCustomer.salutation.displayName'] = $innerEvent->getOrder()->getOrderCustomer()->getSalutation()->getDisplayName();
+                $data['order.stateMachineState.name'] = $innerEvent->getOrder()->getStateMachineState()->getName();
+             } catch (\Throwable $t) {
+                error_log($t->getMessage());
+            }
             $data['items'] = $this->getOrderItems($innerEvent->getOrder(), $innerEvent->getContext());
+
+            /*
+            'order.stateMachineState.name'
+             */
         }
 
         foreach ($mappevents as $mevent) {
@@ -333,10 +361,10 @@ class MappConnectSubscriber implements EventSubscriberInterface
 
             $serializer = new Serializer([$normalizer], [$encoder]);
 
-            /*$ser = $serializer->serialize($innerEvent, 'json', [AbstractNormalizer::IGNORED_ATTRIBUTES => ['language',
+            $ser = $serializer->serialize($innerEvent, 'json', [AbstractNormalizer::IGNORED_ATTRIBUTES => ['language',
                 'translations', 'registrationTitle', 'registrationIntroduction', 'registrationOnlyCompanyRegistration',
                 'registrationSeoMetaDescription']]);
-            error_log("SER " . $ser);*/
+            error_log("SER " . $ser);
 
             $arrayData = $serializer->normalize($innerEvent, 'json', [AbstractNormalizer::IGNORED_ATTRIBUTES => ['language',
                 'translations', 'registrationTitle', 'registrationIntroduction', 'registrationOnlyCompanyRegistration',
@@ -347,6 +375,9 @@ class MappConnectSubscriber implements EventSubscriberInterface
             }
 
             $result = $this->flattenArray($result);
+            foreach (array_keys($result) as $key) {
+                error_log($key . ' - ' . $result[$key]);
+            }
         } catch (\Throwable $t) {
             error_log($t->getMessage());
             $result['error'] = $t->getMessage();

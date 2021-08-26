@@ -20,6 +20,7 @@
           <argument type="service" id="Mapp\Connect\Shopware\Entity\MappEventDefinition" />
           <argument type="service" id="product.repository"/>
           <argument type="service" id="product_manufacturer.repository"/>
+          <argument type="service" id="language.repository"/>
           <tag name="kernel.event_subscriber"/>
       </service>
       <service id="Mapp\Connect\Shopware\Entity\MappEventDefinition">
