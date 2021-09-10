@@ -58,7 +58,12 @@
         <input-field type="bool">
             <name>dataNewsletter</name>
             <label>Newsletter</label>
-            <helpText>Adds users to Newsletter group. Sendout and optin is setup wihin Newsletter group</helpText>
+            <helpText>Adds users to Newsletter group. Sendout and optin is setup within Newsletter group</helpText>
+        </input-field>
+        <input-field type="bool">
+            <name>dataNewsletterDoi</name>
+            <label>Newsletter - double optin</label>
+            <helpText>Invites users to Newsletter group. User will be fully subscribed to the newsletter after accepting the invitation.</helpText>
         </input-field>
     </card>
     <card>

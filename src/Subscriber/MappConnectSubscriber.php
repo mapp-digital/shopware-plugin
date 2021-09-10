@@ -77,7 +77,8 @@ class MappConnectSubscriber implements EventSubscriberInterface
 
     public function onNewsletterChange(EntityWrittenEvent $event)
     {
-        if ($this->mappConnectService->isEnable('dataNewsletter')) {
+        $doi = $this->mappConnectService->isEnable('dataNewsletterDoi');
+        if ($this->mappConnectService->isEnable('dataNewsletter') || $doi) {
             foreach ($event->getPayloads() as $data) {
                 $mcdata = [
                     'email' => $data['email'],
@@ -89,8 +90,13 @@ class MappConnectSubscriber implements EventSubscriberInterface
                     'group' => $this->mappConnectService->getGroup('Newsletter')
                 ];
 
-                if ($data['status'] == 'optOut')
+                if ($data['status'] == 'optOut') {
                     $mcdata['unsubscribe'] = true;
+                } else {
+                    if ($doi) {
+                        $mcdata['doubleOptIn'] = true;
+                    }
+                }
 
                 if ($mc = $this->mappConnectService->getMappConnectClient()) {
                     $mc->event('newsletter', $mcdata);
