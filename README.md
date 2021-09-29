@@ -12,27 +12,35 @@ to execute basic events:
 
 ## Installation ##
 
-1. For *Shopware plugin* you should put this repo plugin sources to Shopware `src/custom/plugins/` folder cleaning `shopware-plugin` names/folders first,
-   app will automatically detect all plugins that residue within this folder,
+The preferred method is via [composer](https://getcomposer.org). Follow the
+[installation instructions](https://getcomposer.org/doc/00-intro.md) if you do not already have
+composer installed.
 
-2. If upgrading from previous version please remember to update database
-   `php bin/console database:migrate MappConnect --all`
+Once composer is installed, execute the following command in your project root to install this library:
 
-Clear shopware cache
-`php bin/console cache:clear`
+```bash
+composer require mappconnect/shopware-plugin
+php bin/console plugin:refresh
+php bin/console plugin:install --activate --clearCache MappConnect
+```
 
-And deploy new UI assets
-`php bin/console asset:install`
+# Manual Installation
 
-3. *Shopware plugin* you can activate by
+Alternatively you can download the package in its entirety.
+1. Put plugin sources to Shopware `src/custom/plugins/` folder cleaning `shopware-plugin` names/folders first, app will automatically detect all plugins that residue within this folder,
 
-3a. [Shopware 6.3.x] Going to *Administration* section in Shopware, and next go to *Settings->System->Plugins* and from the list **Install** ( you can also **Configure** it from context menu), and next **Activate** this within toggle button,
+2.
+```bash
+composer require mappconnect/client
+php bin/console plugin:refresh
+php bin/console plugin:install --activate --clearCache MappConnect
+```
+# Configuration
 
-3b. [Shopware 6.4.x] Going to *Extensions* section in Shopware, and next go to *My extensions->Apps* and from the list **Install** ( you can also **Configure** it from context menu), and next **Activate** this within toggle button,
+*Shopware plugin* you can activate by
 
-3c. You can also activate this from the Shopware console by:
+* [Shopware 6.3.x] Going to *Administration* section in Shopware, and next go to *Settings->System->Plugins* and from the list **Install** ( you can also **Configure** it from context menu), and next **Activate** this within toggle button,
 
-* `php bin/console plugin:refresh`
-* `php bin/console plugin:install --activate MappConnect`
+* [Shopware 6.4.x] Going to *Extensions* section in Shopware, and next go to *My extensions->Apps* and from the list **Install** ( you can also **Configure** it from context menu), and next **Activate** this within toggle button,
 
 Now you use Plugin along with Buissnes Events triggering message sendout or sending event to Whiteboard (automation).

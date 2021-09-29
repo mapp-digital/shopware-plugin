@@ -15,7 +15,7 @@ class Migration1626697605MappEvent extends MigrationStep
     public function update(Connection $connection): void
     {
         $connection->executeUpdate('
-            CREATE TABLE `mapp_event` (
+            CREATE TABLE IF NOT EXISTS `mapp_event` (
               `id` BINARY(16) NOT NULL,
               `title` VARCHAR(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
               `event_name` VARCHAR(500) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -30,7 +30,7 @@ class Migration1626697605MappEvent extends MigrationStep
           ');
 
         $connection->executeUpdate('
-            CREATE TABLE `mapp_event_sales_channel` (
+            CREATE TABLE IF NOT EXISTS `mapp_event_sales_channel` (
                 `mapp_event_id` binary(16) NOT NULL,
                 `sales_channel_id` binary(16) NOT NULL,
                 PRIMARY KEY (`mapp_event_id`,`sales_channel_id`),

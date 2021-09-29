@@ -1,7 +1,7 @@
 {
     "name": "mappconnect/shopware-plugin",
     "description": "Mapp Connect integration for Shopware 6",
-    "version": "0.0.1",
+    "version": "0.0.3",
     "type": "shopware-platform-plugin",
     "license": "MIT",
     "authors": [
@@ -10,10 +10,8 @@
         }
     ],
     "require": {
-        "shopware/core": ">=6.4.2.1",
-        "firebase/php-jwt": "^5.0",
-        "guzzlehttp/guzzle": "~7.2",
-        "guzzlehttp/psr7": "^1.2"
+        "shopware/core": "~6.3 | ~6.4",
+        "mappconnect/client": "^0.1"
     },
     "extra": {
         "shopware-plugin-class": "Mapp\\Connect\\Shopware\\MappConnect",

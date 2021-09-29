@@ -3,6 +3,7 @@
 namespace Mapp\Connect\Shopware\Service;
 
 use Shopware\Core\System\SystemConfig\SystemConfigService;
+use Mapp\Connect\Client;
 
 class MappConnectService
 {
