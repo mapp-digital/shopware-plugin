@@ -29,6 +29,8 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Mapp\Connect\Shopware\Entity\MappEventCollection;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Content\Newsletter\SalesChannel\NewsletterSubscribeRoute;
+use Shopware\Core\Content\Newsletter\Event\NewsletterConfirmEvent;
 
 class MappConnectSubscriber implements EventSubscriberInterface
 {
@@ -58,6 +60,7 @@ class MappConnectSubscriber implements EventSubscriberInterface
     {
         return [
             NewsletterEvents::NEWSLETTER_RECIPIENT_WRITTEN_EVENT => 'onNewsletterChange',
+            NewsletterConfirmEvent::class => 'onNewsletterConfirm',
             GuestCustomerRegisterEvent::class => 'onGuestRegister',
             CustomerRegisterEvent::class => 'onCustomerRegister',
             CheckoutOrderPlacedEvent::class => 'onOrderPlaced',
@@ -78,30 +81,41 @@ class MappConnectSubscriber implements EventSubscriberInterface
     public function onNewsletterChange(EntityWrittenEvent $event)
     {
         $doi = $this->mappConnectService->isEnable('dataNewsletterDoi');
-        if ($this->mappConnectService->isEnable('dataNewsletter') || $doi) {
+        $nle = $this->mappConnectService->isEnable('dataNewsletter');
+        $mc = $this->mappConnectService->getMappConnectClient();
+
+        if ($mc && ($nle || $doi)) {
             foreach ($event->getPayloads() as $data) {
-                $mcdata = [
-                    'email' => $data['email'],
-                    'title' => $data['title'],
-                    'firstName' => $data['firstName'],
-                    'lastName' => $data['lastName'],
-                    'languageId' => $data['languageId'],
-                    'zipCode' => $data['zipCode'],
-                    'group' => $this->mappConnectService->getGroup('Newsletter')
-                ];
 
-                if ($data['status'] == 'optOut') {
-                    $mcdata['unsubscribe'] = true;
-                } else {
-                    if ($doi) {
-                        $mcdata['doubleOptIn'] = true;
-                    }
-                }
-
-                if ($mc = $this->mappConnectService->getMappConnectClient()) {
-                    $mc->event('newsletter', $mcdata);
+                if ($data['status'] == NewsletterSubscribeRoute::STATUS_OPT_OUT) {
+                    $mc->event('newsletter', [
+                        'email' => $data['email'],
+                        'group' => $this->mappConnectService->getGroup('Newsletter'),
+                        'unsubscribe' => true
+                    ]);
                 }
             }
+        }
+    }
+
+    public function onNewsletterConfirm(NewsletterConfirmEvent $event)
+    {
+        $doi = $this->mappConnectService->isEnable('dataNewsletterDoi');
+        $nle = $this->mappConnectService->isEnable('dataNewsletter');
+        $mc = $this->mappConnectService->getMappConnectClient();
+        if ($mc && ($nle || $doi)) {
+            $data = $event->getNewsletterRecipient();
+            $mcdata = [
+                'email' => $data->getEmail(),
+                'firstName' => $data->getFirstName(),
+                'lastName' => $data->getLastName(),
+                'zipCode' => $data->getZipCode(),
+                'city' => $data->getCity(),
+                'group' => $this->mappConnectService->getGroup('Newsletter')
+            ];
+            if ($doi)
+                $mcdata['doubleOptIn'] = true;
+            $mc->event('newsletter', $mcdata);
         }
     }
 
@@ -118,12 +132,6 @@ class MappConnectSubscriber implements EventSubscriberInterface
                 'birthday' => $customer->getBirthday(),
                 'group' => $this->mappConnectService->getGroup('Customers')
             ];
-
-            /*$language = $this->languageRepository->search(new Criteria([$customer->getLanguageId()]), $event->getContext())->first();
-            if (!is_null($language)) {
-                $data['languageId'] = $language->getLocaleId();
-                $data['languageName'] = $language->getName();
-            }*/
 
             if ($mc = $this->mappConnectService->getMappConnectClient()) {
                 $mc->event('user', $data);
@@ -158,6 +166,8 @@ class MappConnectSubscriber implements EventSubscriberInterface
             return;
 
         $data = $this->getOrderData($event);
+        if (is_null($data))
+            return;
 
         $mc->event('transaction', $data);
     }
@@ -259,7 +269,6 @@ class MappConnectSubscriber implements EventSubscriberInterface
         }
 
         $innerEvent = $event->getEvent();
-        error_log("Event " . $innerEvent->getName() . " class " . get_class($innerEvent));
 
         $userEmailFromEvent = $this->getUserEmailFromEvent($event);
 
@@ -304,10 +313,6 @@ class MappConnectSubscriber implements EventSubscriberInterface
                 error_log($t->getMessage());
             }
             $data['items'] = $this->getOrderItems($innerEvent->getOrder(), $innerEvent->getContext());
-
-            /*
-            'order.stateMachineState.name'
-             */
         }
 
         foreach ($mappevents as $mevent) {
@@ -351,9 +356,16 @@ class MappConnectSubscriber implements EventSubscriberInterface
     private function getDataToBeSentForEvent(array $eventData, BusinessEvent $event) {
         $result = array();
         $innerEvent = $event->getEvent();
-        $fieldsToBeExtracted = self::$fieldsForEvents[get_class($innerEvent)];
-        foreach ($fieldsToBeExtracted as $key => $value) {
-            $result[$value] = $eventData[$value];
+        if (array_key_exists(get_class($innerEvent), self::$fieldsForEvents)) {
+            $fieldsToBeExtracted = self::$fieldsForEvents[get_class($innerEvent)];
+            foreach ($fieldsToBeExtracted as $key => $value) {
+                $result[$value] = $eventData[$value];
+            }
+        } else {
+            foreach ($eventData as $key => $val) {
+                if (substr_count($key, '.') < 2)
+                    $result[$key] = $val;
+            }
         }
         return $result;
     }
@@ -370,7 +382,6 @@ class MappConnectSubscriber implements EventSubscriberInterface
             $ser = $serializer->serialize($innerEvent, 'json', [AbstractNormalizer::IGNORED_ATTRIBUTES => ['language',
                 'translations', 'registrationTitle', 'registrationIntroduction', 'registrationOnlyCompanyRegistration',
                 'registrationSeoMetaDescription']]);
-            error_log("SER " . $ser);
 
             $arrayData = $serializer->normalize($innerEvent, 'json', [AbstractNormalizer::IGNORED_ATTRIBUTES => ['language',
                 'translations', 'registrationTitle', 'registrationIntroduction', 'registrationOnlyCompanyRegistration',
@@ -381,9 +392,6 @@ class MappConnectSubscriber implements EventSubscriberInterface
             }
 
             $result = $this->flattenArray($result);
-            foreach (array_keys($result) as $key) {
-                error_log($key . ' - ' . $result[$key]);
-            }
         } catch (\Throwable $t) {
             error_log($t->getMessage());
             $result['error'] = $t->getMessage();
