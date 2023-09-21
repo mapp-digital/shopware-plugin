@@ -1,0 +1,18 @@
+version: '3.5'
+services:
+  shopware:
+    image: dockware/play:latest
+    container_name: shopware.test
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./composer.json:/var/www/html/custom/plugins/MappConnect/composer.json
+      - ./src:/var/www/html/custom/plugins/MappConnect/src
+      - ./tmp:/var/www/html/log
+    networks:
+      - mapp
+
+networks:
+  mapp:
+    name: mapp_shopware
