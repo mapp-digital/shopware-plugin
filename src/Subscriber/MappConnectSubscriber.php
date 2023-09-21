@@ -14,27 +14,26 @@ use Shopware\Core\Checkout\Cart\Event\CheckoutOrderPlacedEvent;
 use Shopware\Core\Checkout\Order\Event\OrderStateMachineStateChangeEvent;
 use Shopware\Core\Content\ContactForm\Event\ContactFormEvent;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
+use Shopware\Core\Framework\Event\BusinessEvents;
+use Shopware\Core\Framework\Event\BusinessEvent;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Shopware\Core\Framework\DataAbstractionLayer\DefinitionInstanceRegistry;
 use Mapp\Connect\Shopware\Entity\MappEventDefinition;
+use Shopware\Core\Framework\Event\BusinessEventInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Mapp\Connect\Shopware\Entity\MappEventCollection;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Content\Newsletter\SalesChannel\NewsletterSubscribeRoute;
 use Shopware\Core\Content\Newsletter\Event\NewsletterConfirmEvent;
-use Symfony\Contracts\EventDispatcher\Event;
 
 class MappConnectSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var MappConnectService
-     */
     private $mappConnectService;
 
     private $mappEventDefinition;
@@ -45,9 +44,9 @@ class MappConnectSubscriber implements EventSubscriberInterface
         MappConnectService $mappConnectService,
         DefinitionInstanceRegistry $definitionRegistry,
         MappEventDefinition $mappEventDefinition,
-        EntityRepository $productRepository,
-        EntityRepository $productManufacturerRepository,
-        EntityRepository $languageRepository)
+        EntityRepositoryInterface $productRepository,
+        EntityRepositoryInterface $productManufacturerRepository,
+        EntityRepositoryInterface $languageRepository)
     {
         $this->mappConnectService = $mappConnectService;
         $this->definitionRegistry = $definitionRegistry;
@@ -65,107 +64,7 @@ class MappConnectSubscriber implements EventSubscriberInterface
             GuestCustomerRegisterEvent::class => 'onGuestRegister',
             CustomerRegisterEvent::class => 'onCustomerRegister',
             CheckoutOrderPlacedEvent::class => 'onOrderPlaced',
-
-            // BusinessEvents::GLOBAL_EVENT
-            'Shopware\\Core\\Checkout\\Customer\\Event\\DoubleOptInGuestOrderEvent' => 'onBusinessEvent',
-            'Shopware\\Core\\Checkout\\Customer\\Event\\CustomerDoubleOptInRegistrationEvent' => 'onBusinessEvent',
-            'Shopware\\Core\\Checkout\\Customer\\Event\\CustomerLoginEvent' => 'onBusinessEvent',
-            'Shopware\\Core\\Checkout\\Customer\\Event\\CustomerLogoutEvent' => 'onBusinessEvent',
-            'Shopware\\Core\\Checkout\\Order\\Event\\OrderPaymentMethodChangedEvent' => 'onBusinessEvent',
-            'Shopware\\Core\\Content\\ContactForm\\Event\\ContactFormEvent' => 'onBusinessEvent',
-            'Shopware\\Core\\Checkout\\Customer\\Event\\CustomerGroupRegistrationAccepted' => 'onBusinessEvent',
-            'Shopware\\Core\\Checkout\\Customer\\Event\\CustomerGroupRegistrationDeclined' => 'onBusinessEvent',
-            'Shopware\\Core\\Checkout\\Customer\\Event\\CustomerAccountRecoverRequestEvent' => 'onBusinessEvent',
-            'Shopware\\Core\\Content\\MailTemplate\\Service\\Event\\MailBeforeSentEvent' => 'onBusinessEvent',
-            'Shopware\\Core\\Content\\MailTemplate\\Service\\Event\\MailBeforeValidateEvent' => 'onBusinessEvent',
-            'Shopware\\Core\\Content\\MailTemplate\\Service\\Event\\MailSentEvent' => 'onBusinessEvent',
-            'Shopware\\Core\\Content\\Newsletter\\Event\\NewsletterRegisterEvent' => 'onBusinessEvent',
-            'Shopware\\Core\\Content\\Newsletter\\Event\\NewsletterUnsubscribeEvent' => 'onBusinessEvent',
-            'Shopware\\Core\\Content\\ProductExport\\Event\\ProductExportLoggingEvent' => 'onBusinessEvent',
-            'Shopware\\Core\\Content\\Product\\SalesChannel\\Review\\Event\\ReviewFormEvent' => 'onBusinessEvent',
-            'Shopware\\Core\\Checkout\\Order\\Event\\OrderStateMachineStateChangeEvent' => 'onBusinessEvent',
-            'Shopware\\Core\\System\\User\\Recovery\\UserRecoveryRequestEvent' => 'onBusinessEvent',
-
-            'checkout.customer.before.login' => 'onBusinessEvent',
-            'checkout.customer.changed-payment-method' => 'onBusinessEvent',
-            'checkout.customer.deleted' => 'onBusinessEvent',
-            'checkout.customer.double_opt_in_guest_order' => 'onBusinessEvent',
-            'checkout.customer.double_opt_in_registration' => 'onBusinessEvent',
-            'checkout.customer.login' => 'onBusinessEvent',
-            'checkout.customer.logout' => 'onBusinessEvent',
-            'checkout.order.payment_method.changed' => 'onBusinessEvent',
-            'contact_form.send' => 'onBusinessEvent',
-            'customer.group.registration.accepted' => 'onBusinessEvent',
-            'customer.group.registration.declined' => 'onBusinessEvent',
-            'customer.recovery.request' => 'onBusinessEvent',
-            'mail.after.create.message' => 'onBusinessEvent',
-            'mail.before.send' => 'onBusinessEvent',
-            'mail.sent' => 'onBusinessEvent',
-            'newsletter.register' => 'onBusinessEvent',
-            'newsletter.unsubscribe' => 'onBusinessEvent',
-            'product_export.log' => 'onBusinessEvent',
-            'review_form.send' => 'onBusinessEvent',
-            'state_enter.order.state.cancelled' => 'onBusinessEvent',
-            'state_enter.order.state.completed' => 'onBusinessEvent',
-            'state_enter.order.state.in_progress' => 'onBusinessEvent',
-            'state_enter.order.state.open' => 'onBusinessEvent',
-            'state_enter.order_delivery.state.cancelled' => 'onBusinessEvent',
-            'state_enter.order_delivery.state.open' => 'onBusinessEvent',
-            'state_enter.order_delivery.state.returned' => 'onBusinessEvent',
-            'state_enter.order_delivery.state.returned_partially' => 'onBusinessEvent',
-            'state_enter.order_delivery.state.shipped' => 'onBusinessEvent',
-            'state_enter.order_delivery.state.shipped_partially' => 'onBusinessEvent',
-            'state_enter.order_transaction.state.authorized' => 'onBusinessEvent',
-            'state_enter.order_transaction.state.cancelled' => 'onBusinessEvent',
-            'state_enter.order_transaction.state.chargeback' => 'onBusinessEvent',
-            'state_enter.order_transaction.state.failed' => 'onBusinessEvent',
-            'state_enter.order_transaction.state.in_progress' => 'onBusinessEvent',
-            'state_enter.order_transaction.state.open' => 'onBusinessEvent',
-            'state_enter.order_transaction.state.paid' => 'onBusinessEvent',
-            'state_enter.order_transaction.state.paid_partially' => 'onBusinessEvent',
-            'state_enter.order_transaction.state.refunded' => 'onBusinessEvent',
-            'state_enter.order_transaction.state.refunded_partially' => 'onBusinessEvent',
-            'state_enter.order_transaction.state.reminded' => 'onBusinessEvent',
-            'state_enter.order_transaction.state.unconfirmed' => 'onBusinessEvent',
-            'state_enter.order_transaction_capture.state.completed' => 'onBusinessEvent',
-            'state_enter.order_transaction_capture.state.failed' => 'onBusinessEvent',
-            'state_enter.order_transaction_capture.state.pending' => 'onBusinessEvent',
-            'state_enter.order_transaction_capture_refund.state.cancelled' => 'onBusinessEvent',
-            'state_enter.order_transaction_capture_refund.state.completed' => 'onBusinessEvent',
-            'state_enter.order_transaction_capture_refund.state.failed' => 'onBusinessEvent',
-            'state_enter.order_transaction_capture_refund.state.in_progress' => 'onBusinessEvent',
-            'state_enter.order_transaction_capture_refund.state.open' => 'onBusinessEvent',
-            'state_leave.order.state.cancelled' => 'onBusinessEvent',
-            'state_leave.order.state.completed' => 'onBusinessEvent',
-            'state_leave.order.state.in_progress' => 'onBusinessEvent',
-            'state_leave.order.state.open' => 'onBusinessEvent',
-            'state_leave.order_delivery.state.cancelled' => 'onBusinessEvent',
-            'state_leave.order_delivery.state.open' => 'onBusinessEvent',
-            'state_leave.order_delivery.state.returned' => 'onBusinessEvent',
-            'state_leave.order_delivery.state.returned_partially' => 'onBusinessEvent',
-            'state_leave.order_delivery.state.shipped' => 'onBusinessEvent',
-            'state_leave.order_delivery.state.shipped_partially' => 'onBusinessEvent',
-            'state_leave.order_transaction.state.authorized' => 'onBusinessEvent',
-            'state_leave.order_transaction.state.cancelled' => 'onBusinessEvent',
-            'state_leave.order_transaction.state.chargeback' => 'onBusinessEvent',
-            'state_leave.order_transaction.state.failed' => 'onBusinessEvent',
-            'state_leave.order_transaction.state.in_progress' => 'onBusinessEvent',
-            'state_leave.order_transaction.state.open' => 'onBusinessEvent',
-            'state_leave.order_transaction.state.paid' => 'onBusinessEvent',
-            'state_leave.order_transaction.state.paid_partially' => 'onBusinessEvent',
-            'state_leave.order_transaction.state.refunded' => 'onBusinessEvent',
-            'state_leave.order_transaction.state.refunded_partially' => 'onBusinessEvent',
-            'state_leave.order_transaction.state.reminded' => 'onBusinessEvent',
-            'state_leave.order_transaction.state.unconfirmed' => 'onBusinessEvent',
-            'state_leave.order_transaction_capture.state.completed' => 'onBusinessEvent',
-            'state_leave.order_transaction_capture.state.failed' => 'onBusinessEvent',
-            'state_leave.order_transaction_capture.state.pending' => 'onBusinessEvent',
-            'state_leave.order_transaction_capture_refund.state.cancelled' => 'onBusinessEvent',
-            'state_leave.order_transaction_capture_refund.state.completed' => 'onBusinessEvent',
-            'state_leave.order_transaction_capture_refund.state.failed' => 'onBusinessEvent',
-            'state_leave.order_transaction_capture_refund.state.in_progress' => 'onBusinessEvent',
-            'state_leave.order_transaction_capture_refund.state.open' => 'onBusinessEvent',
-            'user.recovery.request' => 'onBusinessEvent'
+            BusinessEvents::GLOBAL_EVENT => 'onBusinessEvent'
         ];
     }
 
@@ -197,8 +96,6 @@ class MappConnectSubscriber implements EventSubscriberInterface
                 }
             }
         }
-
-        $this->onBusinessEvent($event);
     }
 
     public function onNewsletterConfirm(NewsletterConfirmEvent $event)
@@ -220,8 +117,6 @@ class MappConnectSubscriber implements EventSubscriberInterface
                 $mcdata['doubleOptIn'] = true;
             $mc->event('newsletter', $mcdata);
         }
-
-        $this->onBusinessEvent($event);
     }
 
     public function onCustomerRegister(CustomerRegisterEvent $event)
@@ -242,8 +137,6 @@ class MappConnectSubscriber implements EventSubscriberInterface
                 $mc->event('user', $data);
             }
         }
-
-        $this->onBusinessEvent($event);
     }
 
     public function onGuestRegister(GuestCustomerRegisterEvent $event)
@@ -264,8 +157,6 @@ class MappConnectSubscriber implements EventSubscriberInterface
                 $mc->event('guest', $data);
             }
         }
-
-        $this->onBusinessEvent($event);
     }
 
     public function onOrderPlaced(CheckoutOrderPlacedEvent $event)
@@ -279,12 +170,9 @@ class MappConnectSubscriber implements EventSubscriberInterface
             return;
 
         $mc->event('transaction', $data);
-
-        $this->onBusinessEvent($event);
     }
 
-    private function getOrderData(CheckoutOrderPlacedEvent $event)
-    {
+    private function getOrderData(CheckoutOrderPlacedEvent $event) {
         $order = $event->getOrder();
         $data = [
             'orderNumber' => $order->getOrderNumber(),
@@ -323,8 +211,7 @@ class MappConnectSubscriber implements EventSubscriberInterface
         return $data;
     }
 
-    private function getOrderItems(OrderEntity $orderEntity, Context $context)
-    {
+    private function getOrderItems(OrderEntity $orderEntity, Context $context) {
         $items = array();
         foreach ($orderEntity->getLineItems() as $lineItem) {
             if ($lineItem->getType() !== LineItem::PRODUCT_LINE_ITEM_TYPE)
@@ -351,7 +238,7 @@ class MappConnectSubscriber implements EventSubscriberInterface
         return $items;
     }
 
-    private function getMappEvents(Event $event, Context $context): MappEventCollection
+    private function getMappEvents(BusinessEventInterface $event, Context $context): MappEventCollection
     {
         $name = $event->getName();
 
@@ -374,13 +261,16 @@ class MappConnectSubscriber implements EventSubscriberInterface
         return $events;
     }
 
-    public function onBusinessEvent(Event $innerEvent)
+    public function onBusinessEvent(BusinessEvent $event)
     {
-        if (!$this->shouldTriggerDefaultLogic($innerEvent)) {
+
+        if (!$this->shouldTriggerDefaultLogic($event)) {
             return;
         }
 
-        $userEmailFromEvent = $this->getUserEmailFromEvent($innerEvent);
+        $innerEvent = $event->getEvent();
+
+        $userEmailFromEvent = $this->getUserEmailFromEvent($event);
 
         $mc = $this->mappConnectService->getMappConnectClient();
         if (is_null($mc))
@@ -400,8 +290,8 @@ class MappConnectSubscriber implements EventSubscriberInterface
 
         // data for this event can't be extracted this way
         if (!$innerEvent instanceof OrderStateMachineStateChangeEvent) {
-            $eventData = $this->extractEventData($innerEvent);
-            $eventDataToBeSent = $this->getDataToBeSentForEvent($eventData, $innerEvent);
+            $eventData = $this->extractEventData($event);
+            $eventDataToBeSent = $this->getDataToBeSentForEvent($eventData, $event);
             foreach ($eventDataToBeSent as $key => $value) {
                 $data[$key] = $value;
             }
@@ -419,7 +309,7 @@ class MappConnectSubscriber implements EventSubscriberInterface
                 $data['order.orderCustomer.title'] = $innerEvent->getOrder()->getOrderCustomer()->getTitle();
                 $data['order.orderCustomer.salutation.displayName'] = $innerEvent->getOrder()->getOrderCustomer()->getSalutation()->getDisplayName();
                 $data['order.stateMachineState.name'] = $innerEvent->getOrder()->getStateMachineState()->getName();
-            } catch (\Throwable $t) {
+             } catch (\Throwable $t) {
                 error_log($t->getMessage());
             }
             $data['items'] = $this->getOrderItems($innerEvent->getOrder(), $innerEvent->getContext());
@@ -435,13 +325,14 @@ class MappConnectSubscriber implements EventSubscriberInterface
 
     }
 
-    private function shouldTriggerDefaultLogic(Event $innerEvent)
+    private function shouldTriggerDefaultLogic(BusinessEvent $event)
     {
+        $innerEvent = $event->getEvent();
         return !($innerEvent instanceof EntityWrittenEvent || $innerEvent instanceof CheckoutOrderPlacedEvent);
     }
 
-    private function getUserEmailFromEvent(Event $innerEvent)
-    {
+    private function getUserEmailFromEvent(BusinessEvent $event) {
+        $innerEvent = $event->getEvent();
         if ($innerEvent instanceof CustomerAccountRecoverRequestEvent) {
             return $innerEvent->getCustomerRecovery()->getCustomer()->getEmail();
         } elseif ($innerEvent instanceof UserRecoveryRequestEvent) {
@@ -456,14 +347,15 @@ class MappConnectSubscriber implements EventSubscriberInterface
             return $innerEvent->getCustomer()->getEmail();
         } elseif ($innerEvent instanceof CheckoutOrderPlacedEvent) {
             return $innerEvent->getOrder()->getOrderCustomer()->getEmail();
-        } else {
+        }
+        else {
             return "unknown";
         }
     }
 
-    private function getDataToBeSentForEvent(array $eventData, Event $innerEvent)
-    {
+    private function getDataToBeSentForEvent(array $eventData, BusinessEvent $event) {
         $result = array();
+        $innerEvent = $event->getEvent();
         if (array_key_exists(get_class($innerEvent), self::$fieldsForEvents)) {
             $fieldsToBeExtracted = self::$fieldsForEvents[get_class($innerEvent)];
             foreach ($fieldsToBeExtracted as $key => $value) {
@@ -478,9 +370,9 @@ class MappConnectSubscriber implements EventSubscriberInterface
         return $result;
     }
 
-    private function extractEventData(Event $innerEvent)
-    {
+    private function extractEventData(BusinessEvent $event) {
         $result = array();
+        $innerEvent = $event->getEvent();
         try {
             $normalizer = new ObjectNormalizer();
             $encoder = new JsonEncoder();

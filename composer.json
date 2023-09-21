@@ -1,7 +1,7 @@
 {
     "name": "mappconnect/shopware-plugin",
     "description": "Mapp Connect integration for Shopware 6",
-    "version": "0.0.5",
+    "version": "0.0.4",
     "type": "shopware-platform-plugin",
     "license": "MIT",
     "authors": [
@@ -10,8 +10,7 @@
         }
     ],
     "require": {
-        "shopware/core": "^6.4|^6.5",
-        "shopware/storefront": "^6.4|^6.5",
+        "shopware/core": "~6.4",
         "mappconnect/client": "^0.1"
     },
     "extra": {
@@ -28,11 +27,6 @@
     "autoload": {
         "psr-4": {
             "Mapp\\Connect\\Shopware\\": "src/"
-        }
-    },
-    "config": {
-        "allow-plugins": {
-            "symfony/runtime": false
         }
     }
 }
