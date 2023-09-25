@@ -17,13 +17,13 @@ daily:
 delete-image:
 	docker image rm dockware/play
 debug-htaccess:
-	docker exec -t shopware.test bash -c "echo \"SetEnv MAPP_CONNECT_CLIENT_DEBUG=debug\" >> .htaccess && echo \"SetEnv MAPP_CONNECT_CLIENT_LOG=/var/www/html/log/mapp_connect_debug.log\" >> .htaccess"
+	docker exec -t shopware.test bash -c "echo \"SetEnv MAPP_CONNECT_CLIENT_DEBUG=debug\" >> .htaccess"
 debug-env:
-	docker exec -t shopware.test bash -c "echo \"MAPP_CONNECT_CLIENT_DEBUG=debug\" >> .env && echo \"MAPP_CONNECT_CLIENT_LOG=/var/www/html/log/mapp_connect_debug.log\" >> .env"
+	docker exec -t shopware.test bash -c "echo \"MAPP_CONNECT_CLIENT_DEBUG=debug\" >> .env"
 debug:
 	make debug-env && make debug-htaccess
 composer:
-	docker exec -t shopware.test bash -c "composer require mappconnect/client"
+	docker exec -t shopware.test bash -c "composer require mappconnect/client:dev-debug"
 install:
 	docker exec -t shopware.test bash -c "./bin/console plugin:refresh && ./bin/console plugin:install --clearCache MappConnect"
 activate:

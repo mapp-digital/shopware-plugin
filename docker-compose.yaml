@@ -9,7 +9,6 @@ services:
     volumes:
       - ./composer.json:/var/www/html/custom/plugins/MappConnect/composer.json
       - ./src:/var/www/html/custom/plugins/MappConnect/src
-      - ./tmp:/var/www/html/log
     networks:
       - mapp
 
