@@ -261,7 +261,7 @@ class MappConnectSubscriber implements EventSubscriberInterface
             ];
 
             if ($mc = $this->mappConnectService->getMappConnectClient()) {
-                $mc->event('guest', $data);
+                $mc->event('user', $data);
             }
         }
 
