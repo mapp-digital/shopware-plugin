@@ -154,7 +154,7 @@ class MappConnectSubscriber implements EventSubscriberInterface
             ];
 
             if ($mc = $this->mappConnectService->getMappConnectClient()) {
-                $mc->event('guest', $data);
+                $mc->event('user', $data);
             }
         }
     }
@@ -223,8 +223,13 @@ class MappConnectSubscriber implements EventSubscriberInterface
             $item['unitPrice'] = strval($lineItem->getUnitPrice());
 
             if (!is_null($product)) {
+                $productName = $product->getName();
+                if ($productName === null) {
+                    $productName = $lineItem->getLabel();
+                }
+
                 $item['productId'] = $product->getProductNumber();
-                $item['name'] = $product->getName();
+                $item['name'] = $productName;
                 $item['description'] = $product->getDescription();
 
                 if (!is_null($product->getManufacturerId())) {

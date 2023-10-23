@@ -27,7 +27,6 @@ class MappConnectController extends AbstractController
     }
 
     /**
-     *
      * @Route("/api/mappconnect/connection-status", name="api.action.mappconnect.connection-status", methods={"GET"})
      * @Route("/api/v{version}/mappconnect/connection-status", name="api.action.mappconnect.connection-status.failback", methods={"GET"})
      * @Acl({})
@@ -39,7 +38,6 @@ class MappConnectController extends AbstractController
     }
 
     /**
-     *
      * @Route("/api/mappconnect/groups", name="api.action.mappconnect.groups", methods={"GET"})
      * @Route("/api/v{version}/mappconnect/groups", name="api.action.mappconnect.groups.failback", methods={"GET"})
      * @Acl({})
@@ -51,7 +49,6 @@ class MappConnectController extends AbstractController
     }
 
     /**
-     *
      * @Route("/api/mappconnect/messages", name="api.action.mappconnect.messages", methods={"GET"})
      * @Route("/api/v{version}/mappconnect/messages", name="api.action.mappconnect.messages.failback", methods={"GET"})
      * @Acl({})
