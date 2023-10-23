@@ -23,7 +23,7 @@ debug-env:
 debug:
 	make debug-env && make debug-htaccess
 composer:
-	docker exec -t shopware.test bash -c "composer require mappconnect/client:dev-debug"
+	docker exec -t shopware.test bash -c "composer require mappconnect/client"
 install:
 	docker exec -t shopware.test bash -c "./bin/console plugin:refresh && ./bin/console plugin:install --clearCache MappConnect"
 activate:
