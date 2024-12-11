@@ -9,8 +9,16 @@ services:
     volumes:
       - ./composer.json:/var/www/html/custom/plugins/MappConnect/composer.json
       - ./src:/var/www/html/custom/plugins/MappConnect/src
+      - "shopware_connect_db_volume:/var/lib/mysql"
+      - "shopware_connect_shop_volume:/var/www/html"
     networks:
       - mapp
+
+volumes:
+  shopware_connect_db_volume:
+    driver: local
+  shopware_connect_shop_volume:
+    driver: local
 
 networks:
   mapp:

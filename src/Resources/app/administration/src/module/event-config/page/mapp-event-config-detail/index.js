@@ -119,7 +119,17 @@ Component.register('mapp-event-config-detail', {
             );
         },
 
+        onEventNameUpdate(newValue) {
+            this.mappEvent.eventName = newValue;
+        },
 
+        onEventTitleUpdate(newValue) {
+            this.mappEvent.title = newValue;
+        },
+        onEventActiveUpdate(newValue) {
+            this.mappEvent.active = newValue;
+        },
+        
         getBusinessEvents() {
             return this.businessEventService.getBusinessEvents();
         },

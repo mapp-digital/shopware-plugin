@@ -12,7 +12,7 @@ build:
 	docker-compose build --no-cache
 stop:
 	docker-compose down
-daily:
+ready:
 	make start && make composer && make install && make activate
 delete-image:
 	docker image rm dockware/play
@@ -28,8 +28,11 @@ install:
 	docker exec -t shopware.test bash -c "./bin/console plugin:refresh && ./bin/console plugin:install --clearCache MappConnect"
 activate:
 	docker exec -t shopware.test bash -c "./bin/console plugin:activate --clearCache MappConnect"
+deactivate:
+	docker exec -t shopware.test bash -c "./bin/console plugin:deactivate --clearCache MappConnect"
 get-version:
 	@docker exec -t shopware.test php -r "require './vendor/composer/InstalledVersions.php';echo(Composer\InstalledVersions::getVersion('shopware/core'));"
 exec-shopware:
 	docker exec -it shopware.test bash
-
+build-admin:
+	sudo chown -R www-data:www-data ./src/Resources && docker exec -t shopware.test bash -c "./bin/build-administration.sh" && sudo chown -R $(USER_GROUP) ./src/Resources

@@ -57,7 +57,7 @@ class MappConnectService
             $resp = $mc->connect([
               'params' => [
                 'shopwareurl' => $_SERVER['APP_URL'],
-                'shopwareversion' => \PackageVersions\Versions::getVersion('shopware/core'),
+                // 'shopwareversion' => \PackageVersions\Versions::getVersion('shopware/core'), // todo find way to get version
                 'shopwarename' => $this->systemConfigService->get('core.basicInformation.shopName'),
                 'website' => parse_url($_SERVER['APP_URL'], PHP_URL_HOST)
               ]
