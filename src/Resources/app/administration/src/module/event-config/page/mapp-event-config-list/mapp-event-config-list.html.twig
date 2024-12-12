@@ -44,13 +44,6 @@
                 {{ item.eventName }}
             </template>
 
-            <template #column-salesChannels="{ item, isInlineEdit }">
-                <sw-event-action-list-expand-labels
-                    :items="item.salesChannels"
-                    :disabled="isInlineEdit">
-                </sw-event-action-list-expand-labels>
-            </template>
-
             <template #column-rules="{ item, isInlineEdit }">
                 <sw-event-action-list-expand-labels
                     :items="item.rules"
