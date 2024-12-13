@@ -67,11 +67,16 @@
                     </template>
                 </sw-single-select>
 
-                <sw-entity-multi-select
-                    v-if="mappEvent"
-                    label="Sales Channel"
-                    v-model="mappEvent.salesChannels">
-                </sw-entity-multi-select>
+                <sw-multi-select
+                    :options="salesChannels"
+                    label="Sales Channels"
+                    v-model="selectedSalesChannels"
+                    labelProperty="name"
+                    valueProperty="id"
+                    @item-add="onSalesChannelAdd"
+                    @item-remove="onSalesChannelRemove"
+                />
+
 
                 <mapp-select
                     v-if="mappEvent"
