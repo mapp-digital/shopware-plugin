@@ -44,11 +44,8 @@
                 {{ item.eventName }}
             </template>
 
-            <template #column-rules="{ item, isInlineEdit }">
-                <sw-event-action-list-expand-labels
-                    :items="item.rules"
-                    :disabled="isInlineEdit">
-                </sw-event-action-list-expand-labels>
+            <template #column-salesChannels="{ item }">
+                {{ item.salesChannels.map(s=>s.name).join(", ")}}
             </template>
 
             <template #column-active="{ item, isInlineEdit }">

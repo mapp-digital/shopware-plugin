@@ -77,14 +77,12 @@
                     @item-remove="onSalesChannelRemove"
                 />
 
-
                 <mapp-select
                     v-if="mappEvent"
                     label="Message"
                     entity="message"
                     v-bind:value="mappEvent.messageId"
-                    @update:value="mappEvent.messageId = $event"
-                    >
+                    @update:value="mappEvent.messageId = $event">
                 </mapp-select>
 
             </sw-card>

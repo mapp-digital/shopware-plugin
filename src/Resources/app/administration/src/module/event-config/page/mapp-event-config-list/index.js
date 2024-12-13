@@ -106,9 +106,6 @@ Component.register('mapp-event-config-list', {
                 .search(this.mappEventCriteria, Shopware.Context.api)
                 .then((response) => {
                     this.items = response;
-                    this.items.forEach((item, index, items) => {
-                        items[index].salesChannels = item.salesChannels.map(s => s.name).join(", ");
-                    });
                     this.total = response.total;
                     this.isLoading = false;
                 });
