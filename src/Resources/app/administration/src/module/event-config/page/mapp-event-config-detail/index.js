@@ -185,8 +185,6 @@ Component.register('mapp-event-config-detail', {
 
         onSave() {
             this.isLoading = true;
-            console.log("save-repo", JSON.parse(JSON.stringify(this.mappEventRepository)));
-            console.log("save-mappEvent", JSON.parse(JSON.stringify(this.mappEvent)));
             return this.mappEventRepository
                 .save(this.mappEvent, Shopware.Context.api, this.mappEventCriteria)
                 .then(() => {
