@@ -42,7 +42,9 @@ Component.register('mapp-event-config-detail', {
             mappEvent: null,
             isLoading: false,
             recipients: [],
-            isSaveSuccessful: false
+            isSaveSuccessful: false,
+            salesChannels: null,
+            selectedSalesChannels: []
         };
     },
 
@@ -69,19 +71,56 @@ Component.register('mapp-event-config-detail', {
             return "New MappConnect Business Event";
         },
 
+        salesChannelCriteria() {
+            const criteria = new Criteria();
+            criteria.addSorting(Criteria.sort('name'));
+            return criteria;
+        },
 
     },
 
     created() {
+        this.loadSalesChannels();
         this.createdComponent();
+
     },
 
     methods: {
+        loadSalesChannels() {
+            const salesChannelRepository = this.repositoryFactory.create('sales_channel');
+            return salesChannelRepository.search(this.salesChannelCriteria, Shopware.Context.api)
+                .then((result) => {
+                    this.salesChannels = result;
+                })
+                .catch((error) => {
+                    this.createNotificationError({
+                        message: `Failed to load sales channels: ${error.message}`,
+                    });
+                });
+        },
         createdComponent() {
             this.loadData();
         },
 
-        loadData() {
+        onSalesChannelAdd(sc) {
+            this.selectedSalesChannels = [sc.id, ...this.selectedSalesChannels];
+            this.mappEvent.salesChannels = this.salesChannels.filter(salesChannel =>
+                        this.selectedSalesChannels.includes(salesChannel.id)
+                    );
+        },
+
+        onSalesChannelRemove(salesChannel) {
+            this.selectedSalesChannels = this.selectedSalesChannels.filter(s=>s!==salesChannel.id);
+            if(this.mappEventId) {
+                this.mappEvent.salesChannels.remove(salesChannel.id);  
+            } else {
+                this.mappEvent.salesChannels = this.salesChannels.filter(salesChannel =>
+                    this.selectedSalesChannels.includes(salesChannel.id)
+                );
+            } 
+        },
+
+        loadData(isSave) {
             this.isLoading = true;
 
             return Promise
@@ -89,6 +128,9 @@ Component.register('mapp-event-config-detail', {
                 .then(([businessEvents, mappEvent]) => {
                     this.businessEvents = this.addTranslatedEventNames(businessEvents);
                     this.mappEvent = mappEvent;
+                    if(!isSave) {
+                        this.selectedSalesChannels = mappEvent.salesChannels.map(s=>s.id);
+                    }
 
                     this.isLoading = false;
 
@@ -119,7 +161,17 @@ Component.register('mapp-event-config-detail', {
             );
         },
 
+        onEventNameUpdate(newValue) {
+            this.mappEvent.eventName = newValue;
+        },
 
+        onEventTitleUpdate(newValue) {
+            this.mappEvent.title = newValue;
+        },
+        onEventActiveUpdate(newValue) {
+            this.mappEvent.active = newValue;
+        },
+        
         getBusinessEvents() {
             return this.businessEventService.getBusinessEvents();
         },
@@ -133,9 +185,8 @@ Component.register('mapp-event-config-detail', {
 
         onSave() {
             this.isLoading = true;
-
             return this.mappEventRepository
-                .save(this.mappEvent, Shopware.Context.api)
+                .save(this.mappEvent, Shopware.Context.api, this.mappEventCriteria)
                 .then(() => {
                     if (this.mappEvent.isNew()) {
                         this.$router.push({
@@ -143,9 +194,12 @@ Component.register('mapp-event-config-detail', {
                         });
                         return Promise.resolve(this.mappEvent);
                     }
-                    this.loadData();
+                    this.loadData(true);
+                    // this.mappEvent.salesChannels = this.salesChannels.filter(salesChannel =>
+                    //     this.selectedSalesChannels.includes(salesChannel.id)
+                    // );
                     this.isSaveSuccessful = true;
-
+                    
                     return Promise.resolve(this.mappEvent);
                 })
                 .catch((exception) => {

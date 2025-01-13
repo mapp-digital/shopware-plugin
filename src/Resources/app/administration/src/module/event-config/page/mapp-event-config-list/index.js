@@ -86,7 +86,6 @@ Component.register('mapp-event-config-list', {
                 property: 'salesChannels',
                 dataIndex: 'salesChannels',
                 label: 'Sales Channel',
-                sortable: false,
                 allowResize: true,
                 multiLine: true
             }, {
