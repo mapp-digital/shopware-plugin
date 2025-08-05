@@ -28,6 +28,9 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Content\Newsletter\SalesChannel\NewsletterSubscribeRoute;
 use Shopware\Core\Content\Newsletter\Event\NewsletterConfirmEvent;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\OrFilter;
+use Shopware\Core\Framework\Event\SalesChannelAware;
+use Shopware\Core\System\User\Recovery\UserRecoveryRequestEvent;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class MappConnectSubscriber implements EventSubscriberInterface
@@ -40,6 +43,9 @@ class MappConnectSubscriber implements EventSubscriberInterface
     private $mappEventDefinition;
 
     private $definitionRegistry;
+    private $productRepository;
+    private $productManufacturerRepository;
+    private $languageRepository;
 
     public function __construct(
         MappConnectService $mappConnectService,
@@ -315,6 +321,7 @@ class MappConnectSubscriber implements EventSubscriberInterface
 
         $mappevents = $this->getMappEvents($event, $event->getContext());
         if (!is_null($mappevents) && $mappevents->count() > 0) {
+            /** @var MappEvent $mevent */
             foreach ($mappevents as $mevent) {
                 $data['messageId'] = $mevent->getMessageId();
             }
@@ -330,6 +337,7 @@ class MappConnectSubscriber implements EventSubscriberInterface
             if ($lineItem->getType() !== LineItem::PRODUCT_LINE_ITEM_TYPE)
                 continue;
 
+            /** @var ProductEntity|null */
             $product = $this->productRepository->search(new Criteria([$lineItem->getProductId()]), $context)->first();
 
             $item['quantity'] = $lineItem->getQuantity();
@@ -346,6 +354,7 @@ class MappConnectSubscriber implements EventSubscriberInterface
                 $item['description'] = $product->getDescription();
 
                 if (!is_null($product->getManufacturerId())) {
+                    /** @var ProductManufacturerEntity|null */
                     $productManufacturer = $this->productManufacturerRepository->search(new Criteria([$product->getManufacturerId()]), $context)->first();
                     $item['manufacturerName'] = $productManufacturer->getName();
                 }
@@ -430,6 +439,7 @@ class MappConnectSubscriber implements EventSubscriberInterface
             $data['items'] = $this->getOrderItems($innerEvent->getOrder(), $innerEvent->getContext());
         }
 
+        /** @var MappEvent $mevent */
         foreach ($mappevents as $mevent) {
             if ($mevent->getMessageId() > 0) {
                 $type = 'email';
