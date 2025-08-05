@@ -10,8 +10,8 @@
         }
     ],
     "require": {
-        "shopware/core": "^6.6",
-        "shopware/storefront": "^6.6",
+        "shopware/core": "^6.7",
+        "shopware/storefront": "^6.7",
         "mappconnect/client": "^0.1"
     },
     "extra": {
