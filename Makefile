@@ -36,3 +36,5 @@ exec-shopware:
 	docker exec -it shopware.test bash
 build-admin:
 	sudo chown -R www-data:www-data ./src/Resources && docker exec -t shopware.test bash -c "./bin/build-administration.sh" && sudo chown -R $(USER_GROUP) ./src/Resources
+build-admin-on-mac:
+	docker exec -t shopware.test bash -c "./bin/build-administration.sh"
