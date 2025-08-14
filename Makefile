@@ -2,6 +2,7 @@ USER_NAME := $(shell id -un)
 USER_ID := $(shell id -u)
 GROUP_ID := $(shell id -g)
 USER_GROUP = $(USER_ID):$(GROUP_ID)
+VERSION := $(shell jq -r .version composer.json)
 
 export USER_ID
 export GROUP_ID
