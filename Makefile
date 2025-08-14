@@ -2,6 +2,7 @@ USER_NAME := $(shell id -un)
 USER_ID := $(shell id -u)
 GROUP_ID := $(shell id -g)
 USER_GROUP = $(USER_ID):$(GROUP_ID)
+VERSION := $(shell jq -r .version composer.json)
 
 export USER_ID
 export GROUP_ID
@@ -36,3 +37,7 @@ exec-shopware:
 	docker exec -it shopware.test bash
 build-admin:
 	sudo chown -R www-data:www-data ./src/Resources && docker exec -t shopware.test bash -c "./bin/build-administration.sh" && sudo chown -R $(USER_GROUP) ./src/Resources
+build-admin-on-mac:
+	docker exec -t shopware.test bash -c "./bin/build-administration.sh"
+zip:
+	mkdir MappConnect && cp -r ./src ./MappConnect/src && cp ./composer.json ./MappConnect/composer.json && cp CHANGELOG.md ./MappConnect/CHANGELOG.md && cp ./LICENSE ./MappConnect/LICENSE && zip -r MappConnect_for_Shopware6_$(VERSION).zip ./MappConnect && rm -rf ./MappConnect

@@ -493,34 +493,42 @@ class MappConnectSubscriber implements EventSubscriberInterface
         return $result;
     }
 
-    private function extractEventData(Event $innerEvent)
-    {
-        $result = array();
-        try {
-            $normalizer = new ObjectNormalizer();
-            $encoder = new JsonEncoder();
+private function extractEventData(Event $innerEvent)
+{
+    $result = array();
+    try {
+        $ignoredAttributes = [
+            'language',
+            'translations',
+            'registrationTitle',
+            'registrationIntroduction',
+            'registrationOnlyCompanyRegistration',
+            'registrationSeoMetaDescription',
+            'password',
+            'legacyPassword',
+            'hash',
+            'passwordResetToken'
+        ];
 
-            $serializer = new Serializer([$normalizer], [$encoder]);
+        $normalizer = new ObjectNormalizer();
+        $encoder = new JsonEncoder();
+        $serializer = new Serializer([$normalizer], [$encoder]);
 
-            $ser = $serializer->serialize($innerEvent, 'json', [AbstractNormalizer::IGNORED_ATTRIBUTES => ['language',
-                'translations', 'registrationTitle', 'registrationIntroduction', 'registrationOnlyCompanyRegistration',
-                'registrationSeoMetaDescription']]);
+        $arrayData = $serializer->normalize($innerEvent, 'json', [
+            AbstractNormalizer::IGNORED_ATTRIBUTES => $ignoredAttributes
+        ]);
 
-            $arrayData = $serializer->normalize($innerEvent, 'json', [AbstractNormalizer::IGNORED_ATTRIBUTES => ['language',
-                'translations', 'registrationTitle', 'registrationIntroduction', 'registrationOnlyCompanyRegistration',
-                'registrationSeoMetaDescription']]);
-
-            foreach (array_keys($innerEvent->getAvailableData()->toArray()) as $key) {
-                $result[$key] = $arrayData[$key];
-            }
-
-            $result = $this->flattenArray($result);
-        } catch (\Throwable $t) {
-            error_log($t->getMessage());
-            $result['error'] = $t->getMessage();
+        foreach (array_keys($innerEvent->getAvailableData()->toArray()) as $key) {
+            $result[$key] = $arrayData[$key];
         }
-        return $result;
+
+        $result = $this->flattenArray($result);
+    } catch (\Throwable $t) {
+        error_log($t->getMessage());
+        $result['error'] = $t->getMessage();
     }
+    return $result;
+}
 
     private function flattenArray($array, $prefix = '')
     {

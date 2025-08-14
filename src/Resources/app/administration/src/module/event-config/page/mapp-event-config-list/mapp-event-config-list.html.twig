@@ -50,7 +50,7 @@
 
             <template #column-active="{ item, isInlineEdit }">
                 <sw-data-grid-column-boolean
-                    v-model="item.active"
+                    :value="item.active"
                     :isInlineEdit="isInlineEdit">
                 </sw-data-grid-column-boolean>
             </template>
