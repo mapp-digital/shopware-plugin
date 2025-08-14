@@ -28,14 +28,14 @@
                         type="text"
                         label="Title"
                         placeholder=""
-                        v-model="mappEvent.title"
+                        :value="mappEvent.title"
                         @update:value="onEventTitleUpdate">
                         >
                     </sw-text-field>
                     <sw-switch-field
                         v-if="mappEvent"
                         label="Active"
-                        v-model="mappEvent.active"
+                        :value="mappEvent.active"
                         bordered
                         @update:value="onEventActiveUpdate">
                     </sw-switch-field>
@@ -46,7 +46,7 @@
                     v-if="mappEvent && businessEvents"
                     label="Business Event"
                     :options="businessEvents"
-                    v-model="mappEvent.eventName"
+                    :value="mappEvent.eventName"
                     required
                     labelProperty="label"
                     valueProperty="name"
@@ -70,7 +70,7 @@
                 <sw-multi-select
                     :options="salesChannels"
                     label="Sales Channels"
-                    v-model="selectedSalesChannels"
+                    :value="selectedSalesChannels"
                     labelProperty="name"
                     valueProperty="id"
                     @item-add="onSalesChannelAdd"

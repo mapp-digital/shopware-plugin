@@ -1,0 +1,23 @@
+{
+  "base": "/bundles/mappconnect/administration/",
+  "entryPoints": {
+    "mapp-connect": {
+      "css": [],
+      "dynamic": [],
+      "js": [
+        "/bundles/mappconnect/administration/assets/mapp-connect-Dsx-O2z3.js"
+      ],
+      "legacy": false,
+      "preload": []
+    }
+  },
+  "legacy": false,
+  "metadatas": {},
+  "version": [
+    "7.1.0",
+    7,
+    1,
+    0
+  ],
+  "viteServer": null
+}
