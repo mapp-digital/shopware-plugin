@@ -4,11 +4,11 @@
     </template>
 
     <template #smart-bar-actions>
-        <mt-button :routerLink="{ name: 'mapp.event.config.index' }">
+        <sw-button :routerLink="{ name: 'mapp.event.config.index' }">
               {{ $tc('global.default.cancel') }}
-        </mt-button>
+        </sw-button>
 
-        <mt-button-process
+        <sw-button-process
               :isLoading="isLoading"
               :processSuccess="isSaveSuccessful"
               variant="primary"
@@ -16,14 +16,14 @@
               :disabled="isLoading"
               @click.prevent="onSave">
               {{ $tc('sw-product.detail.buttonSave') }}
-        </mt-button-process>
+        </sw-button-process>
     </template>
 
     <template #content>
-        <mt-card-view>
-            <mt-card :isLoading="isLoading">
+        <sw-card-view>
+            <sw-card :isLoading="isLoading">
                 <sw-container columns="75% 1fr" gap="30px">
-                    <mt-text-field
+                    <sw-text-field
                         v-if="mappEvent"
                         type="text"
                         label="Title"
@@ -31,14 +31,14 @@
                         :value="mappEvent.title"
                         @update:value="onEventTitleUpdate">
                         >
-                    </mt-text-field>
-                    <mt-switch
+                    </sw-text-field>
+                    <sw-switch
                         v-if="mappEvent"
                         label="Active"
                         :value="mappEvent.active"
                         bordered
                         @update:value="onEventActiveUpdate">
-                    </mt-switch>
+                    </sw-switch>
                 </sw-container>
 
 
@@ -85,7 +85,7 @@
                     @update:value="mappEvent.messageId = $event">
                 </mapp-select>
 
-            </mt-card>
-        </mt-card-view>
+            </sw-card>
+        </sw-card-view>
     </template>
 </sw-page>
